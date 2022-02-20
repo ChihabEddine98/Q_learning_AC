@@ -63,6 +63,7 @@ class BootstrappedContinuousCritic(nn.Module, BaseCritic):
 
             arguments:
                 ob_no: shape: (sum_of_path_lengths, ob_dim)
+                ac_na: length: sum_of_path_lengths. The action taken at the current step.
                 next_ob_no: shape: (sum_of_path_lengths, ob_dim). The observation after taking one step forward
                 reward_n: length: sum_of_path_lengths. Each element in reward_n is a scalar containing
                     the reward for each timestep
@@ -72,27 +73,18 @@ class BootstrappedContinuousCritic(nn.Module, BaseCritic):
             returns:
                 training loss
         """
-        # TODO: Implement the pseudocode below: do the following (
-        # self.num_grad_steps_per_target_update * self.num_target_updates)
-        # times:
-        # every self.num_grad_steps_per_target_update steps (which includes the
-        # first step), recompute the target values by
-        #     a) calculating V(s') by querying the critic with next_ob_no
-        #     b) and computing the target values as r(s, a) + gamma * V(s')
-        # every time, update this critic using the observations and targets
-        #
-        # HINT: don't forget to use terminal_n to cut off the V(s') (ie set it
-        #       to 0) when a terminal state is reached
-        # HINT: make sure to squeeze the output of the critic_network to ensure
-        #       that its dimensions match the reward
+        ''' 
+            TODO #35 ✅ : Update the parameters of the critic
+        '''
 
         for i in range(self.num_grad_steps_per_target_update * self.num_target_updates):
             if i % self.num_grad_steps_per_target_update == 0:
-                rtg = self.forward_np(next_ob_no)
-                targets = reward_n + self.gamma * rtg * (1- terminal_n)
+                V_s_next = self.forward_np(next_ob_no)
+                targets = reward_n + self.gamma * V_s_next * (1- terminal_n)
                 targets = ptu.from_numpy(targets)
 
             predictions = self.forward(ptu.from_numpy(ob_no))
+            
             self.optimizer.zero_grad()
             loss = self.loss(predictions, targets)
             loss.backward()

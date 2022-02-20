@@ -12,8 +12,7 @@ class ArgMaxPolicy(object):
         else:
             observation = obs[None]
         
-        ## TODO return the action that maxinmizes the Q-value 
-        # at the current observation as the output
-        actions = self.critic.qa_values(observation).argmax(-1)
-
-        return actions.squeeze()
+        ''' 
+            TODO #24 ✅ : return the action that maxinmizes the Q-value .
+        '''
+        return self.critic.qa_values(observation).argmax(-1).squeeze()

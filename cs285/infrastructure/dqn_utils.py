@@ -86,16 +86,6 @@ def create_lander_q_network(ob_dim, num_actions):
         nn.ReLU(),
         nn.Linear(64, 64),
         nn.ReLU(),
-
-        # Q3 
-
-        # nn.Linear(64, 64),
-        # nn.ReLU(),
-
-        # nn.Linear(128, 128),
-        # nn.ReLU(),
-
-        # end Q3
         nn.Linear(64, num_actions),
     )
 

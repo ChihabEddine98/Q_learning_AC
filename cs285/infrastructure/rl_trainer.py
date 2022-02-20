@@ -138,7 +138,7 @@ class RL_Trainer(object):
 
         for itr in range(n_iter):
             if itr % print_period == 0:
-                print("\n\n********** Iteration %i ************"%itr)
+                print(f"\n\n********** Iteration [{itr}/{n_iter}] ************")
 
             # decide if videos should be rendered/logged at this iteration
             if itr % self.params['video_log_freq'] == 0 and self.params['video_log_freq'] != -1:
@@ -209,43 +209,51 @@ class RL_Trainer(object):
             paths: a list trajectories
             envsteps_this_batch: the sum over the numbers of environment steps in paths
             train_video_paths: paths which also contain videos for visualization purposes
-            """
-        # TODO: get this from Piazza
-
+        """
+        ''' 
+            TODO #1 ✅ : decide whether to load training data or use the current policy to collect more data
+        ''' 
         if itr == 0:
             if initial_expertdata is not None:
                 paths = pickle.load(open(self.params['expert_data'], 'rb'))
                 return paths, 0, None
             if save_expert_data_to_disk:
                 num_transitions_to_sample = self.params['batch_size_initial']
-
-        # collect data to be used for training
+          
+        '''
+           TODO #2 ✅ : collect `num_transitions_to_sample` samples to be used for training
+        '''      
         print("\nCollecting data to be used for training...")
         paths, envsteps_this_batch = utils.sample_trajectories(self.env, collect_policy, num_transitions_to_sample, self.params['ep_len'])
 
         # collect more rollouts with the same policy, to be saved as videos in tensorboard
+        # note: here, we collect MAX_NVIDEO rollouts, each of length MAX_VIDEO_LEN
         train_video_paths = None
-        if self.logvideo:
+        if self.log_video:
             print('\nCollecting train rollouts to be used for saving videos...')
             train_video_paths = utils.sample_n_trajectories(self.env, collect_policy, MAX_NVIDEO, MAX_VIDEO_LEN, True)
 
-        if save_expert_data_to_disk and itr == 0:
-            with open('expert_data_{}.pkl'.format(self.params['env_name']), 'wb') as file:
-                pickle.dump(paths, file)
-
         return paths, envsteps_this_batch, train_video_paths
+        
 
     def train_agent(self):
-        # TODO: get this from Piazza
-        # print('\nTraining agent using sampled data from replay buffer...')
+        print('\nTraining agent using sampled data from replay buffer...')
         all_logs = []
         for train_step in range(self.params['num_agent_train_steps_per_iter']):
+
+            '''
+               TODO #3 ✅ : sample some data from the data buffer
+            '''
             ob_batch, ac_batch, re_batch, next_ob_batch, terminal_batch = self.agent.sample(self.params['train_batch_size'])
 
+            '''
+               TODO #4 ✅ : use the sampled data to train an agent
+            '''
             train_log = self.agent.train(ob_batch, ac_batch, re_batch, next_ob_batch, terminal_batch)
+            if train_step % utils.DEBUG_FRQ == 0 : print(train_log)
             all_logs.append(train_log)
+            
         return all_logs
-
 
     ####################################
     ####################################
