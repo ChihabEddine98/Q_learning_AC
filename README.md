@@ -1,6 +1,6 @@
 ## Setup
 
-You can run this code on your own machine or on Google Colab. 
+You can run this code on your own machine or on Google Colab*. 
 
 1. **Local option:** If you choose to run locally, you will need to install MuJoCo and some Python packages; see [installation.md](../hw1/installation.md) from homework 1 for instructions. There are two new package requirements (`opencv-python` and `gym[atari]`) beyond what was used in the previous assignments; make sure to install these with `pip install -r requirements.txt` if you are running the assignment locally.
 
